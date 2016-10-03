@@ -34,6 +34,12 @@
         <pointsize>14</pointsize>
        </font>
       </property>
+      <property name="layoutDirection">
+       <enum>Qt::RightToLeft</enum>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
      </widget>
     </item>
     <item>
@@ -161,6 +167,9 @@
          <font>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
         </property>
         <property name="text">
          <string>0</string>
@@ -416,7 +425,6 @@
     <bool>false</bool>
    </attribute>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>
