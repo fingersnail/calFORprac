@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDebug>
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +18,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QString alreadyInputString;
     enum operand{plus, minus, by, divide};
     void setSLOT();
     bool isZoreCanOutput();
@@ -41,6 +43,7 @@ private slots:
     void divideButtonClicked();
     void CButtonClicked();
     void CEButtonClicked();
+    void backButtonClicked();
 };
 
 #endif // MAINWINDOW_H

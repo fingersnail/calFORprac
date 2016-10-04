@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    alreadyInputString = ui->resultLineEdit->text();
     setSLOT();
 }
 
@@ -33,6 +33,7 @@ void MainWindow::setSLOT() {
     QObject::connect(ui->divideButton,SIGNAL(clicked()),this,SLOT(divideButtonClicked()));
     QObject::connect(ui->CButton,SIGNAL(clicked()),this,SLOT(CButtonClicked()));
     QObject::connect(ui->CEButton,SIGNAL(clicked()),this,SLOT(CEButtonClicked()));
+    QObject::connect(ui->backButton,SIGNAL(clicked()),this,SLOT(backButtonClicked()));
 }
 
 void MainWindow::button0Clicked() {
@@ -43,7 +44,7 @@ void MainWindow::button0Clicked() {
 }
 
 bool MainWindow::isZoreCanOutput() {
-    QString alreadyInputString= ui->resultLineEdit->text();
+    alreadyInputString= ui->resultLineEdit->text();
     if (alreadyInputString.isEmpty()) {
         return true;
     }
@@ -93,15 +94,20 @@ void MainWindow::button9Clicked() {
     numberButtonClicked(9);
 }
 
+void MainWindow::numberButtonClicked(int clickedNUmber){
+    alreadyInputString = ui->resultLineEdit->text();
+    ui->resultLineEdit->setText(alreadyInputString + QString::number(clickedNUmber));
+}
+
 void MainWindow::dotButtonClicked(){
     if (isDotCanOutPut()) {
-        QString alreadyInputString= ui->resultLineEdit->text();
+        alreadyInputString = ui->resultLineEdit->text();
         ui->resultLineEdit->setText(alreadyInputString + ".");
     }
 }
 
 bool MainWindow::isDotCanOutPut() {
-    QString alreadyInputString= ui->resultLineEdit->text();
+    alreadyInputString = ui->resultLineEdit->text();
     if (alreadyInputString.isEmpty()) {
         return false;
     }
@@ -110,41 +116,38 @@ bool MainWindow::isDotCanOutPut() {
     return lastCharOfResult.isDigit();
 }
 
-void MainWindow::numberButtonClicked(int clickedNUmber){
-    QString alreadyInputString= ui->resultLineEdit->text();
-    ui->resultLineEdit->setText(alreadyInputString + QString::number(clickedNUmber));
-}
+
 
 void MainWindow::plusButtonClicked(){
     if (isOperandCanOutPut()) {
-        QString alreadyInputString= ui->resultLineEdit->text();
+        alreadyInputString = ui->resultLineEdit->text();
         ui->resultLineEdit->setText(alreadyInputString + "+");
     }
 }
 
 void MainWindow::minusButtonClicked(){
     if (isOperandCanOutPut()) {
-        QString alreadyInputString= ui->resultLineEdit->text();
+        alreadyInputString = ui->resultLineEdit->text();
         ui->resultLineEdit->setText(alreadyInputString + "-");
     }
 }
 
 void MainWindow::byButtonClicked() {
     if (isOperandCanOutPut()) {
-        QString alreadyInputString= ui->resultLineEdit->text();
-        ui->resultLineEdit->setText(alreadyInputString + "*");
+        alreadyInputString = ui->resultLineEdit->text();
+        ui->resultLineEdit->setText(alreadyInputString + "×");
     }
 }
 
 void MainWindow::divideButtonClicked(){
     if (isOperandCanOutPut()) {
-        QString alreadyInputString= ui->resultLineEdit->text();
+        alreadyInputString = ui->resultLineEdit->text();
         ui->resultLineEdit->setText(alreadyInputString + "÷");
     }
 }
 
 bool MainWindow::isOperandCanOutPut(){
-    QString alreadyInputString= ui->resultLineEdit->text();
+    alreadyInputString = ui->resultLineEdit->text();
     if (alreadyInputString.isEmpty()) {
         return false;
     }
@@ -159,4 +162,15 @@ void MainWindow::CButtonClicked() {
 
 void MainWindow::CEButtonClicked() {
     ui->resultLineEdit->clear();
+}
+
+void MainWindow::backButtonClicked() {
+    alreadyInputString = ui->resultLineEdit->text();
+    if (alreadyInputString.isEmpty()) {
+        return;
+    }
+
+
+    alreadyInputString.remove(alreadyInputString.size()-1, 1);
+    ui->resultLineEdit->setText(alreadyInputString);
 }
