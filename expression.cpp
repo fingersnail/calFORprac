@@ -74,7 +74,7 @@ bool expression::errorCheck(QString& s)
         }                           //双目运算两边必须为数字或左括号或其他函数
         if (s[i] == 's' || s[i] == 'c' || s[i] == 't' || s[i] == 'd' || s[i] == 'l' || s[i] == '(')
         {
-            if (i>0 && (s[i - 1].isDigit() || s[i - 1] == 'x' || s[i - 1] == ')'))
+            if (i > 0 && (s[i - 1].isDigit() || s[i - 1] == ')'))
                 s.insert(i, "*");
         }                          //将类似3sin5化成3*sin5的形式，方便处理
         if (s[i] == ')'&&i<s.size() - 1 && (s[i + 1].isDigit()))
@@ -126,11 +126,11 @@ QString expression::infixToSuffix(const QString &s) {
     QString three = "sincostanlogdot";
     QString four = "^";          //四种运算优先级
 
-    for (int i = 0; i<s.size(); i++)
+    for (int i = 0; i < s.size(); i++)
     {
         if (s[i].isDigit() || s[i] == '.')
         {
-            while (i<s.size() && (s[i].isDigit() || s[i] == '.'))
+            while (i < s.size() && (s[i].isDigit() || s[i] == '.'))
             {
                 suf += s[i];
                 i++;
@@ -161,7 +161,7 @@ QString expression::infixToSuffix(const QString &s) {
         else if (three.indexOf(s[i]) != -1)
         {
             int flag = 0;
-            if (i>0 || s[i - 1] == '^')
+            if (i > 0 && s[i - 1] == '^')
                 flag = 1;
             while (stackForOp.size() && (four.indexOf(stackForOp.top()) != -1) && flag == 0)
             {
@@ -398,9 +398,9 @@ double expression::cal_E(QString s)
 {
     if (!errorCheck(s))
         return NAN;
-    qDebug() << s;
+    qDebug() << "format: " << s;
     s = infixToSuffix(s);
-    qDebug() << s;
+    qDebug() << "suffix: " << s;
     return calSuffix(s);
 }
 
