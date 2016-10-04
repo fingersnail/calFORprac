@@ -50,12 +50,12 @@ bool MainWindow::isZoreCanOutput() {
         return true;
     }
 
-    QChar lastCharOfResult = alreadyInputString[alreadyInputString.size()-1];
+    QChar lastCharOfResult = alreadyInputString[alreadyInputString.size() - 1];
     if(alreadyInputString.size() == 1) {
         return lastCharOfResult != '0';
     }
 
-    QChar secondLastCharOfResult = alreadyInputString[alreadyInputString.size()-2];
+    QChar secondLastCharOfResult = alreadyInputString[alreadyInputString.size() - 2];
     return secondLastCharOfResult.isDigit();
 }
 
@@ -113,47 +113,47 @@ bool MainWindow::isDotCanOutPut() {
         return false;
     }
 
-    QChar lastCharOfResult = alreadyInputString[alreadyInputString.size()-1];
+    QChar lastCharOfResult = alreadyInputString[alreadyInputString.size() - 1];
     return lastCharOfResult.isDigit();
 }
 
 
 
 void MainWindow::plusButtonClicked(){
-    if (isOperandCanOutPut()) {
+    if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
         ui->resultLineEdit->setText(alreadyInputString + "+");
     }
 }
 
 void MainWindow::minusButtonClicked(){
-    if (isOperandCanOutPut()) {
+    if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
         ui->resultLineEdit->setText(alreadyInputString + "-");
     }
 }
 
 void MainWindow::byButtonClicked() {
-    if (isOperandCanOutPut()) {
+    if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
         ui->resultLineEdit->setText(alreadyInputString + "×");
     }
 }
 
 void MainWindow::divideButtonClicked(){
-    if (isOperandCanOutPut()) {
+    if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
         ui->resultLineEdit->setText(alreadyInputString + "÷");
     }
 }
 
-bool MainWindow::isOperandCanOutPut(){
+bool MainWindow::isOperatorCanOutPut(){
     alreadyInputString = ui->resultLineEdit->text();
     if (alreadyInputString.isEmpty()) {
         return false;
     }
 
-    QChar lastCharOfResult = alreadyInputString[alreadyInputString.size()-1];
+    QChar lastCharOfResult = alreadyInputString[alreadyInputString.size() - 1];
     return lastCharOfResult.isDigit();
 }
 
@@ -172,12 +172,12 @@ void MainWindow::backButtonClicked() {
     }
 
 
-    alreadyInputString.remove(alreadyInputString.size()-1, 1);
+    alreadyInputString.remove(alreadyInputString.size() - 1, 1);
     ui->resultLineEdit->setText(alreadyInputString);
 }
 
 void MainWindow::equalsButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
-    double result = cal_E(alreadyInputString);
+    double result = expression::cal_E(alreadyInputString);
     ui->resultLineEdit->setText(QString::number(result));
 }
