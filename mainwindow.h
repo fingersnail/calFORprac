@@ -43,9 +43,15 @@ private slots:
     void byButtonClicked();
     void divideButtonClicked();
     void CButtonClicked();
-    void CEButtonClicked();
+    //void CEButtonClicked();
     void backButtonClicked();
     void equalsButtonClicked();
+    void sinButtonClicked();
+    void cosButtonClicked();
+    void lnButtonClicked();
+    void leftBraketButtonClicked();
+    void rightBraketButtonClicked();
+
 };
 
 #endif // MAINWINDOW_H

@@ -61,8 +61,12 @@ bool expression::errorCheck(QString& s)
         }                           //中文括号处理起来太麻烦了
         if (s[i] == '+' || s[i] == '-' || s[i] == '*' || s[i] == '/' || s[i] == '^')
         {
-            if (i == 0 || i == s.size() || (!(s[i + 1] == 's') && !(s[i + 1] == 'c') && !(s[i + 1] == 't') && !(s[i + 1] == 'l') && !(s[i + 1] == 'd') && !(s[i + 1] == '(')))
-                if (i == 0 || i == s.size() || !s[i - 1].isDigit() || !s[i + 1].isDigit())
+            if (i == 0 || i == s.size()) {
+                qDebug() << "4运算符使用错误.";
+                return false;
+            }
+            if (s[i + 1] != 's' && s[i + 1] != 'c' && s[i + 1] != 't' && s[i + 1] != 'l' && s[i + 1] != 'd' && s[i + 1] != '(')
+                if (!(s[i - 1].isDigit() || s[i - 1] == ')') || !(s[i + 1].isDigit() || s[i + 1] == '('))
                 {
                     qDebug() << "4运算符使用错误.";
                     return false;

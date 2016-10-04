@@ -32,9 +32,14 @@ void MainWindow::setSLOT() {
     QObject::connect(ui->byButton,SIGNAL(clicked()),this,SLOT(byButtonClicked()));
     QObject::connect(ui->divideButton,SIGNAL(clicked()),this,SLOT(divideButtonClicked()));
     QObject::connect(ui->CButton,SIGNAL(clicked()),this,SLOT(CButtonClicked()));
-    QObject::connect(ui->CEButton,SIGNAL(clicked()),this,SLOT(CEButtonClicked()));
+    //QObject::connect(ui->CEButton,SIGNAL(clicked()),this,SLOT(CEButtonClicked()));
     QObject::connect(ui->backButton,SIGNAL(clicked()),this,SLOT(backButtonClicked()));
     QObject::connect(ui->equalsButton,SIGNAL(clicked()),this,SLOT(equalsButtonClicked()));
+    QObject::connect(ui->sinButton,SIGNAL(clicked()),this,SLOT(sinButtonClicked()));
+    QObject::connect(ui->cosButton,SIGNAL(clicked()),this,SLOT(cosButtonClicked()));
+    QObject::connect(ui->lnButton,SIGNAL(clicked()),this,SLOT(lnButtonClicked()));
+    QObject::connect(ui->leftBraketButton,SIGNAL(clicked()),this,SLOT(leftBraketButtonClicked()));
+    QObject::connect(ui->rightBracketButton,SIGNAL(clicked()),this,SLOT(rightBraketButtonClicked()));
 }
 
 void MainWindow::button0Clicked() {
@@ -154,16 +159,16 @@ bool MainWindow::isOperatorCanOutPut(){
     }
 
     QChar lastCharOfResult = alreadyInputString[alreadyInputString.size() - 1];
-    return lastCharOfResult.isDigit();
+    return lastCharOfResult.isDigit() || lastCharOfResult == ')';
 }
 
 void MainWindow::CButtonClicked() {
     ui->resultLineEdit->clear();
 }
 
-void MainWindow::CEButtonClicked() {
-    ui->resultLineEdit->clear();
-}
+//void MainWindow::CEButtonClicked() {
+//    ui->resultLineEdit->clear();
+//}
 
 void MainWindow::backButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
@@ -171,9 +176,32 @@ void MainWindow::backButtonClicked() {
         return;
     }
 
-
     alreadyInputString.remove(alreadyInputString.size() - 1, 1);
     ui->resultLineEdit->setText(alreadyInputString);
+}
+void MainWindow::sinButtonClicked() {
+    alreadyInputString = ui->resultLineEdit->text();
+    ui->resultLineEdit->setText(alreadyInputString+"sin");
+}
+
+void MainWindow::cosButtonClicked() {
+    alreadyInputString = ui->resultLineEdit->text();
+    ui->resultLineEdit->setText(alreadyInputString+"cos");
+}
+
+void MainWindow::lnButtonClicked() {
+    alreadyInputString = ui->resultLineEdit->text();
+    ui->resultLineEdit->setText(alreadyInputString+"ln");
+}
+
+void MainWindow::leftBraketButtonClicked() {
+    alreadyInputString = ui->resultLineEdit->text();
+    ui->resultLineEdit->setText(alreadyInputString+"(");
+}
+
+void MainWindow::rightBraketButtonClicked() {
+    alreadyInputString = ui->resultLineEdit->text();
+    ui->resultLineEdit->setText(alreadyInputString+")");
 }
 
 void MainWindow::equalsButtonClicked() {
