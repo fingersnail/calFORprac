@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->resultLineEdit->setText("0");
     alreadyInputString = ui->resultLineEdit->text();
     setSLOT();
 }
@@ -56,8 +57,8 @@ void MainWindow::button0Clicked() {
 }
 
 bool MainWindow::isZoreCanOutput() {
-    alreadyInputString= ui->resultLineEdit->text();
-    if (alreadyInputString.isEmpty()) {
+    alreadyInputString = ui->resultLineEdit->text();
+    if (alreadyInputString.isEmpty() || hasDot()) {
         return true;
     }
 
@@ -108,6 +109,9 @@ void MainWindow::button9Clicked() {
 
 void MainWindow::numberButtonClicked(int clickedNUmber){
     alreadyInputString = ui->resultLineEdit->text();
+    if (alreadyInputString == "0") {
+        alreadyInputString = "";
+    }
     ui->resultLineEdit->setText(alreadyInputString + QString::number(clickedNUmber));
 }
 
@@ -120,12 +124,29 @@ void MainWindow::dotButtonClicked(){
 
 bool MainWindow::isDotCanOutPut() {
     alreadyInputString = ui->resultLineEdit->text();
-    if (alreadyInputString.isEmpty()) {
+    if (alreadyInputString.isEmpty() || hasDot()) {
         return false;
     }
 
     QChar lastCharOfResult = alreadyInputString[alreadyInputString.size() - 1];
-    return lastCharOfResult.isDigit();
+    if (lastCharOfResult.isDigit()) {
+        return true;
+    }
+
+    return false;
+}
+
+bool MainWindow::hasDot() {
+    alreadyInputString = ui->resultLineEdit->text();
+
+    for (int i = alreadyInputString.size() - 1; i >= 0; i--) {
+        if (!alreadyInputString[i].isDigit()) {
+            if (alreadyInputString[i] == '.')
+                return true;
+            return false;
+        }
+    }
+    return false;
 }
 
 void MainWindow::signButtonClicked() {
@@ -200,6 +221,7 @@ void MainWindow::backButtonClicked() {
     alreadyInputString.remove(alreadyInputString.size() - 1, 1);
     ui->resultLineEdit->setText(alreadyInputString);
 }
+
 void MainWindow::sinButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
     ui->resultLineEdit->setText(alreadyInputString+"sin");

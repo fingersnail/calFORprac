@@ -24,6 +24,7 @@ private:
     void setSLOT();
     bool isZoreCanOutput();
     bool isDotCanOutPut();
+    bool hasDot();
     bool isOperatorCanOutPut();
     void numberButtonClicked(int clickedNUmber);
 private slots:
