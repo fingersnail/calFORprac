@@ -26,15 +26,21 @@ void MainWindow::setSLOT() {
     QObject::connect(ui->button7,SIGNAL(clicked()),this,SLOT(button7Clicked()));
     QObject::connect(ui->button8,SIGNAL(clicked()),this,SLOT(button8Clicked()));
     QObject::connect(ui->button9,SIGNAL(clicked()),this,SLOT(button9Clicked()));
+
     QObject::connect(ui->dotButton,SIGNAL(clicked()),this,SLOT(dotButtonClicked()));
+    QObject::connect(ui->signButton,SIGNAL(clicked()),this,SLOT(signButtonClicked()));
+
     QObject::connect(ui->plusButton,SIGNAL(clicked()),this,SLOT(plusButtonClicked()));
     QObject::connect(ui->minusButton,SIGNAL(clicked()),this,SLOT(minusButtonClicked()));
     QObject::connect(ui->byButton,SIGNAL(clicked()),this,SLOT(byButtonClicked()));
     QObject::connect(ui->divideButton,SIGNAL(clicked()),this,SLOT(divideButtonClicked()));
+    QObject::connect(ui->powerButton,SIGNAL(clicked()),this,SLOT(powerButtonClicked()));
+
     QObject::connect(ui->CButton,SIGNAL(clicked()),this,SLOT(CButtonClicked()));
     //QObject::connect(ui->CEButton,SIGNAL(clicked()),this,SLOT(CEButtonClicked()));
     QObject::connect(ui->backButton,SIGNAL(clicked()),this,SLOT(backButtonClicked()));
     QObject::connect(ui->equalsButton,SIGNAL(clicked()),this,SLOT(equalsButtonClicked()));
+
     QObject::connect(ui->sinButton,SIGNAL(clicked()),this,SLOT(sinButtonClicked()));
     QObject::connect(ui->cosButton,SIGNAL(clicked()),this,SLOT(cosButtonClicked()));
     QObject::connect(ui->lnButton,SIGNAL(clicked()),this,SLOT(lnButtonClicked()));
@@ -122,7 +128,15 @@ bool MainWindow::isDotCanOutPut() {
     return lastCharOfResult.isDigit();
 }
 
-
+void MainWindow::signButtonClicked() {
+    alreadyInputString = ui->resultLineEdit->text();
+    if (!alreadyInputString.isEmpty()) {
+        if (alreadyInputString[0] == '-')
+            ui->resultLineEdit->setText(alreadyInputString.remove(0,1));
+        else
+            ui->resultLineEdit->setText("-" + alreadyInputString);
+    }
+}
 
 void MainWindow::plusButtonClicked(){
     if (isOperatorCanOutPut()) {
@@ -149,6 +163,13 @@ void MainWindow::divideButtonClicked(){
     if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
         ui->resultLineEdit->setText(alreadyInputString + "÷");
+    }
+}
+
+void MainWindow::powerButtonClicked() {
+    if (isOperatorCanOutPut()) {
+        alreadyInputString = ui->resultLineEdit->text();
+        ui->resultLineEdit->setText(alreadyInputString + "^");
     }
 }
 

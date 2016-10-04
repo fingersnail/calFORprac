@@ -38,10 +38,12 @@ private slots:
     void button8Clicked();
     void button9Clicked();
     void dotButtonClicked();
+    void signButtonClicked();
     void plusButtonClicked();
     void minusButtonClicked();
     void byButtonClicked();
     void divideButtonClicked();
+    void powerButtonClicked();
     void CButtonClicked();
     //void CEButtonClicked();
     void backButtonClicked();
