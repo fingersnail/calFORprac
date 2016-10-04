@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QDebug>
+#include <expression.h>
 
 namespace Ui {
 class MainWindow;
@@ -44,6 +45,7 @@ private slots:
     void CButtonClicked();
     void CEButtonClicked();
     void backButtonClicked();
+    void equalsButtonClicked();
 };
 
 #endif // MAINWINDOW_H

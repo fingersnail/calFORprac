@@ -13,8 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    expression.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    ../../CodeBlocks/ÀúÊ·/math kit/include/Expression.h \
+    expression.h
 
 FORMS    += mainwindow.ui

@@ -34,6 +34,7 @@ void MainWindow::setSLOT() {
     QObject::connect(ui->CButton,SIGNAL(clicked()),this,SLOT(CButtonClicked()));
     QObject::connect(ui->CEButton,SIGNAL(clicked()),this,SLOT(CEButtonClicked()));
     QObject::connect(ui->backButton,SIGNAL(clicked()),this,SLOT(backButtonClicked()));
+    QObject::connect(ui->equalsButton,SIGNAL(clicked()),this,SLOT(equalsButtonClicked()));
 }
 
 void MainWindow::button0Clicked() {
@@ -173,4 +174,10 @@ void MainWindow::backButtonClicked() {
 
     alreadyInputString.remove(alreadyInputString.size()-1, 1);
     ui->resultLineEdit->setText(alreadyInputString);
+}
+
+void MainWindow::equalsButtonClicked() {
+    alreadyInputString = ui->resultLineEdit->text();
+    double result = cal_E(alreadyInputString);
+    ui->resultLineEdit->setText(QString::number(result));
 }
