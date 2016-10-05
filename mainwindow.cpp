@@ -162,6 +162,9 @@ void MainWindow::signButtonClicked() {
 void MainWindow::plusButtonClicked(){
     if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
+        if (alreadyInputString == "0") {
+            alreadyInputString = "";
+        }
         ui->resultLineEdit->setText(alreadyInputString + "+");
     }
 }
@@ -169,6 +172,9 @@ void MainWindow::plusButtonClicked(){
 void MainWindow::minusButtonClicked(){
     if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
+        if (alreadyInputString == "0") {
+            alreadyInputString = "";
+        }
         ui->resultLineEdit->setText(alreadyInputString + "-");
     }
 }
@@ -176,6 +182,9 @@ void MainWindow::minusButtonClicked(){
 void MainWindow::byButtonClicked() {
     if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
+        if (alreadyInputString == "0") {
+            alreadyInputString = "";
+        }
         ui->resultLineEdit->setText(alreadyInputString + "×");
     }
 }
@@ -183,6 +192,9 @@ void MainWindow::byButtonClicked() {
 void MainWindow::divideButtonClicked(){
     if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
+        if (alreadyInputString == "0") {
+            alreadyInputString = "";
+        }
         ui->resultLineEdit->setText(alreadyInputString + "÷");
     }
 }
@@ -190,6 +202,9 @@ void MainWindow::divideButtonClicked(){
 void MainWindow::powerButtonClicked() {
     if (isOperatorCanOutPut()) {
         alreadyInputString = ui->resultLineEdit->text();
+        if (alreadyInputString == "0") {
+            alreadyInputString = "";
+        }
         ui->resultLineEdit->setText(alreadyInputString + "^");
     }
 }
@@ -205,7 +220,7 @@ bool MainWindow::isOperatorCanOutPut(){
 }
 
 void MainWindow::CButtonClicked() {
-    ui->resultLineEdit->clear();
+    ui->resultLineEdit->setText("0");
 }
 
 //void MainWindow::CEButtonClicked() {
@@ -219,31 +234,48 @@ void MainWindow::backButtonClicked() {
     }
 
     alreadyInputString.remove(alreadyInputString.size() - 1, 1);
+    if (alreadyInputString.isEmpty())
+        alreadyInputString = "0";
     ui->resultLineEdit->setText(alreadyInputString);
 }
 
 void MainWindow::sinButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
+    if (alreadyInputString == "0") {
+        alreadyInputString = "";
+    }
     ui->resultLineEdit->setText(alreadyInputString+"sin");
 }
 
 void MainWindow::cosButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
+    if (alreadyInputString == "0") {
+        alreadyInputString = "";
+    }
     ui->resultLineEdit->setText(alreadyInputString+"cos");
 }
 
 void MainWindow::lnButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
+    if (alreadyInputString == "0") {
+        alreadyInputString = "";
+    }
     ui->resultLineEdit->setText(alreadyInputString+"ln");
 }
 
 void MainWindow::leftBraketButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
+    if (alreadyInputString == "0") {
+        alreadyInputString = "";
+    }
     ui->resultLineEdit->setText(alreadyInputString+"(");
 }
 
 void MainWindow::rightBraketButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
+    if (alreadyInputString == "0") {
+        alreadyInputString = "";
+    }
     ui->resultLineEdit->setText(alreadyInputString+")");
 }
 
