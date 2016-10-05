@@ -23,6 +23,14 @@ expression::expression(QString rawExpression) {
     formatExpression();
 }
 
+double expression::calExpression() {
+    if (!errorCheck())
+        return NAN;
+    qDebug() << "No error";
+    suffixExpression = infixToSuffix();
+    return calSuffix(suffixExpression);
+}
+
 void expression::formatExpression() {
     formatedExpression = rawExpression;
     formatOperator();
@@ -169,7 +177,7 @@ bool expression::checkDecimalPoint() const{
     return true;
 }
 
-bool expression::checkOperator() const{
+bool expression::checkOperator() const {
     for (int i = 0; i < formatedExpression.size(); i++) {
         if (BINARY_OPERATOR.indexOf(formatedExpression[i]) != -1 && !isBinaryOperatorPositionRight(formatedExpression, i)) {
             qDebug() << "4运算符使用错误.";
@@ -219,71 +227,61 @@ bool expression::checkExpresionEnding() const{
 
 QString expression::infixToSuffix() {
     QString s = formatedExpression;
-    stack<QChar> stackForOp;
-    QString suf;            //存放后缀表达式
+    stack<QChar> operatorStack;
+    QString suffix;            //存放后缀表达式
     QString one = "+-";
     QString two = "*/";
-    QString three = "sincostanlndot";
+    QString three = UNARY_OPERATOR;
     QString four = "^";          //四种运算优先级
 
-    for (int i = 0; i < s.size(); i++)
-    {
-        if (s[i].isDigit() || s[i] == '.')
-        {
-            while (i < s.size() && (s[i].isDigit() || s[i] == '.'))
-            {
-                suf += s[i];
+    for (int i = 0; i < s.size(); i++) {
+        if (s[i].isDigit()) {
+            while (i < s.size() && (s[i].isDigit() || s[i] == '.')) {
+                suffix += s[i];
                 i++;
             }
             i--;
-            suf += ' ';
+            suffix += ' ';
         }
-        else if (one.indexOf(s[i]) != -1)
-        {
-            while (stackForOp.size() && (one.indexOf(stackForOp.top()) != -1 || two.indexOf(stackForOp.top()) != -1
-                || three.indexOf(stackForOp.top()) != -1 || four.indexOf(stackForOp.top()) != -1))
-            {
-                suf += stackForOp.top();
-                stackForOp.pop();
+        else if (one.indexOf(s[i]) != -1) {
+            while (operatorStack.size() && (one.indexOf(operatorStack.top()) != -1 || two.indexOf(operatorStack.top()) != -1
+                || three.indexOf(operatorStack.top()) != -1 || four.indexOf(operatorStack.top()) != -1)) {
+                suffix += operatorStack.top();
+                operatorStack.pop();
             }
-            stackForOp.push(s[i]);
+            operatorStack.push(s[i]);
         }
-        else if (two.indexOf(s[i]) != -1)
-        {
-            while (stackForOp.size() && (two.indexOf(stackForOp.top()) != -1 || three.indexOf(stackForOp.top()) != -1
-                || four.indexOf(stackForOp.top()) != -1))
-            {
-                suf += stackForOp.top();
-                stackForOp.pop();
+        else if (two.indexOf(s[i]) != -1) {
+            while (operatorStack.size() && (two.indexOf(operatorStack.top()) != -1 || three.indexOf(operatorStack.top()) != -1
+                || four.indexOf(operatorStack.top()) != -1)) {
+                suffix += operatorStack.top();
+                operatorStack.pop();
             }
-            stackForOp.push(s[i]);
+            operatorStack.push(s[i]);
         }
-        else if (three.indexOf(s[i]) != -1)
-        {
+        else if (three.indexOf(s[i]) != -1) {
             int flag = 0;
             if (i > 0 && s[i - 1] == '^')
                 flag = 1;
-            while (stackForOp.size() && (four.indexOf(stackForOp.top()) != -1) && flag == 0)
-            {
-                suf += stackForOp.top();
-                stackForOp.pop();
+            while (operatorStack.size() && (four.indexOf(operatorStack.top()) != -1) && flag == 0) {
+                suffix += operatorStack.top();
+                operatorStack.pop();
             }
-            switch (s[i].unicode())
-            {
+            switch (s[i].unicode()) {
             case 's':
-                stackForOp.push('s');
+                operatorStack.push('s');
                 break;
             case 'c':
-                stackForOp.push('c');
+                operatorStack.push('c');
                 break;
             case 't':
-                stackForOp.push('t');
+                operatorStack.push('t');
                 break;
             case 'd':
-                stackForOp.push('d');
+                operatorStack.push('d');
                 break;
             case 'l':
-                stackForOp.push('l');
+                operatorStack.push('l');
                 i--;
                 break;
             default:
@@ -291,197 +289,175 @@ QString expression::infixToSuffix() {
                 return NULL;
                 break;
             }
-            while (stackForOp.size() && (four.indexOf(stackForOp.top()) != -1))
-            {
-                suf += stackForOp.top();
-                stackForOp.pop();
+            while (operatorStack.size() && (four.indexOf(operatorStack.top()) != -1)) {
+                suffix += operatorStack.top();
+                operatorStack.pop();
             }
             i += 2;
         }
-        else if (four.indexOf(s[i]) != -1)
-        {
-            while (stackForOp.size() && four.indexOf(stackForOp.top()) != -1)
+        else if (four.indexOf(s[i]) != -1) {
+            while (operatorStack.size() && four.indexOf(operatorStack.top()) != -1)
             {
-                suf += stackForOp.top();
-                stackForOp.pop();
+                suffix += operatorStack.top();
+                operatorStack.pop();
             }
-            stackForOp.push(s[i]);
+            operatorStack.push(s[i]);
         }
-        else if (s[i] == ')')
-        {
-            while (stackForOp.top() != '(')
+        else if (s[i] == ')') {
+            while (operatorStack.top() != '(')
             {
-                suf += stackForOp.top();
-                stackForOp.pop();
+                suffix += operatorStack.top();
+                operatorStack.pop();
             }
-            stackForOp.pop();
+            operatorStack.pop();
         }
-        else stackForOp.push(s[i]);
+        else operatorStack.push(s[i]);
     }
-    while (stackForOp.size())
-    {
-        suf += stackForOp.top();
-        stackForOp.pop();
+    while (operatorStack.size()) {
+        suffix += operatorStack.top();
+        operatorStack.pop();
     }
-    return suf;
+    return suffix;
 }
 
-double expression::calSuffix(const QString &s)
-{
-    stack<double> result;
+double expression::calSuffix(const QString &s) {
+    stack<double> resultStack;
     double temp;
-    QString num = "";
+    QString operand = "";
     int i = 0;
-    double a1, a2;
+    double operandLeft, operandRight;
 
-    for (i = 0; i<s.size(); i++)
-    {
-        if (s[i].isDigit() || s[i] == '.')
-        {
-            num += s[i];
+    for (i = 0; i < s.size(); i++) {
+        if (s[i].isDigit() || s[i] == '.') {
+            operand += s[i];
             continue;
         }
-        if (s[i] == ' ')
-        {
-            temp = num.toDouble();
-            result.push(temp);
-            num = "";
+        if (s[i] == ' ') {
+            temp = operand.toDouble();
+            resultStack.push(temp);
+            operand = "";
             continue;
         }
 
-        switch (s[i].unicode())
-        {
+        switch (s[i].unicode()) {
         case '+':
-            if (result.size()<2)
-            {
+            if (resultStack.size()<2) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            a2 = result.top();
-            result.pop();
-            temp = a1 + a2;
-            result.push(temp);
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            operandRight = resultStack.top();
+            resultStack.pop();
+            temp = operandLeft + operandRight;
+            resultStack.push(temp);
             break;
         case '-':
-            if (result.size()<2)
-            {
+            if (resultStack.size() < 2) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            a2 = result.top();
-            result.pop();
-            temp = a2 - a1;
-            result.push(temp);
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            operandRight = resultStack.top();
+            resultStack.pop();
+            temp = operandRight - operandLeft;
+            resultStack.push(temp);
             break;
         case '*':
-            if (result.size()<2)
-            {
+            if (resultStack.size() < 2) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            a2 = result.top();
-            result.pop();
-            temp = a1*a2;
-            result.push(temp);
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            operandRight = resultStack.top();
+            resultStack.pop();
+            temp = operandLeft*operandRight;
+            resultStack.push(temp);
             break;
         case '/':
-            if (result.size()<2)
-            {
+            if (resultStack.size() < 2) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            a2 = result.top();
-            result.pop();
-            if (a1 == 0)
-            {
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            operandRight = resultStack.top();
+            resultStack.pop();
+            if (operandLeft == 0) {
                 return INFINITY;
             }
-            else
-            {
-                temp = a2 / a1;
-                result.push(temp);
+            else {
+                temp = operandRight / operandLeft;
+                resultStack.push(temp);
             }
             break;
         case '^':
-            if (result.size()<2)
-            {
+            if (resultStack.size() < 2) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            a2 = result.top();
-            result.pop();
-            temp = pow(a2, a1);
-            if (isnan(temp))
-            {
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            operandRight = resultStack.top();
+            resultStack.pop();
+            temp = pow(operandRight, operandLeft);
+            if (isnan(temp)) {
                 //cout << "表达式无意义.\n";        可以选择显示提示，但可能对解方程程序有影响
                 return NAN;
             }
-            result.push(temp);
+            resultStack.push(temp);
             break;
         case 's':
-            if (result.size()<1)
-            {
+            if (resultStack.size() < 1) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            temp = sin(a1);
-            result.push(temp);
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            temp = sin(operandLeft);
+            resultStack.push(temp);
             break;
         case 'c':
-            if (result.size()<1)
-            {
+            if (resultStack.size() < 1) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            temp = cos(a1);
-            result.push(temp);
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            temp = cos(operandLeft);
+            resultStack.push(temp);
             break;
         case 't':
-            if (result.size()<1)
-            {
+            if (resultStack.size() < 1) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            temp = tan(a1);
-            result.push(temp);
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            temp = tan(operandLeft);
+            resultStack.push(temp);
             break;
         case 'd':
-            if (result.size()<1)
-            {
+            if (resultStack.size() < 1) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            temp = 1 / tan(a1);
-            result.push(temp);
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            temp = 1 / tan(operandLeft);
+            resultStack.push(temp);
             break;
         case 'l':
-            if (result.size()<1)
-            {
+            if (resultStack.size() < 1) {
                 //cout << "表达式有误.\n";
                 return NAN;
             }
-            a1 = result.top();
-            result.pop();
-            temp = log(a1);
-            result.push(temp);
+            operandLeft = resultStack.top();
+            resultStack.pop();
+            temp = log(operandLeft);
+            resultStack.push(temp);
             break;
         default:
             //cout << "表达式有误.\n";
@@ -489,20 +465,10 @@ double expression::calSuffix(const QString &s)
             break;
         }
     }
-    if (result.size() != 1)
-    {
+    if (resultStack.size() != 1) {
         //cout << "表达式有误.\n";
         return NAN;
     }
-    return result.top();
-}
-
-double expression::calExpression()
-{
-    if (!errorCheck())
-        return NAN;
-    qDebug() << "No error";
-    suffixExpression = infixToSuffix();
-    return calSuffix(suffixExpression);
+    return resultStack.top();
 }
 
