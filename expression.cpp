@@ -27,6 +27,7 @@ void expression::formatExpression() {
     formatedExpression = rawExpression;
     formatOperator();
     removeBlank();
+    removeRedundentBracket();
     removeEqualsSign();
     //turnLnToLog();
     //turncotToDot();
@@ -47,6 +48,7 @@ void expression::formatOperator() {
         if (formatedExpression[i] == ']' || formatedExpression[i] == '}')
             formatedExpression[i] = ')';
     }
+    qDebug() << "format operator success";
 }
 
 void expression::removeBlank() {
@@ -56,6 +58,17 @@ void expression::removeBlank() {
             i--;
         }
     }
+    qDebug() << "remove blank success";
+}
+
+void expression::removeRedundentBracket() {
+    for (int i = 0; i < formatedExpression.size() - 1; i++) {
+        if (formatedExpression[i] == '(' && formatedExpression[i + 1] == ')') {
+            formatedExpression.remove(i, 2);
+            i = -1;
+        }
+    }
+    qDebug() << "format redundent bracket success";
 }
 
 void expression::removeEqualsSign() {
@@ -63,6 +76,7 @@ void expression::removeEqualsSign() {
         return;
     if (formatedExpression[formatedExpression.size() - 1] == '=')
         formatedExpression.remove(formatedExpression.size() - 1, 1);
+    qDebug() << "remove equals sign success";
 }
 
 //void expression::turnLnToLog(){
@@ -91,7 +105,7 @@ void expression::processSignedNumber() {
             formatedExpression.insert(j, ")");
         }
     }
-
+    qDebug() << "process sign number success";
 }
 
 bool expression::isSignedNumber(const QString& s, int i) const {
@@ -111,6 +125,7 @@ void expression::insertMultipleSign() {
                 formatedExpression.insert(i, "*");
         }
     }
+    qDebug() << "insert multiple sign success";
 }
 
 bool expression::isMultipleSignOmitedPosition(const QString& s, int i) const {
@@ -123,7 +138,6 @@ bool expression::isSubExpressionBeginPosition(const QChar c) const {
 }
 
 bool expression::errorCheck() const{
-
     return checkAllCharLegal() && checkDecimalPoint() && checkOperator() && checkBracketMatch() && checkExpresionEnding();
 }
 

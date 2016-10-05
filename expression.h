@@ -33,13 +33,12 @@ private:
     const static QString MITIPLE_SIGN;
     const static QString DIVISION_SIGN;
 
-
-    //将表达式规范化
-    void formatExpression();
+    void formatExpression();    //将表达式规范化
 
     void formatOperator();    //统一符号格式
     void removeBlank();       //去除空白字符
     void removeEqualsSign();  //去除尾部可能出现的等号
+    void removeRedundentBracket();   //去除多余的括号
     //void turnLnToLog();
     void processSignedNumber();   //将带符号数处理成0减或加正数的形式
     bool isSignedNumber(const QString &, int) const; //判断字符串的第相应位位是不是带符号数的正负号
