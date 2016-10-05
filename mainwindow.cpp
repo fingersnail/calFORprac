@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->resultLineEdit->setText("0");
     alreadyInputString = ui->resultLineEdit->text();
+    leftBracketNum = 0;
     setSLOT();
 }
 
@@ -161,56 +162,39 @@ void MainWindow::signButtonClicked() {
 
 void MainWindow::plusButtonClicked(){
     if (isOperatorCanOutPut()) {
-        alreadyInputString = ui->resultLineEdit->text();
-        if (alreadyInputString == "0") {
-            alreadyInputString = "";
-        }
         ui->resultLineEdit->setText(alreadyInputString + "+");
     }
 }
 
 void MainWindow::minusButtonClicked(){
     if (isOperatorCanOutPut()) {
-        alreadyInputString = ui->resultLineEdit->text();
-        if (alreadyInputString == "0") {
-            alreadyInputString = "";
-        }
         ui->resultLineEdit->setText(alreadyInputString + "-");
     }
 }
 
 void MainWindow::byButtonClicked() {
     if (isOperatorCanOutPut()) {
-        alreadyInputString = ui->resultLineEdit->text();
-        if (alreadyInputString == "0") {
-            alreadyInputString = "";
-        }
         ui->resultLineEdit->setText(alreadyInputString + "×");
     }
 }
 
 void MainWindow::divideButtonClicked(){
     if (isOperatorCanOutPut()) {
-        alreadyInputString = ui->resultLineEdit->text();
-        if (alreadyInputString == "0") {
-            alreadyInputString = "";
-        }
         ui->resultLineEdit->setText(alreadyInputString + "÷");
     }
 }
 
 void MainWindow::powerButtonClicked() {
     if (isOperatorCanOutPut()) {
-        alreadyInputString = ui->resultLineEdit->text();
-        if (alreadyInputString == "0") {
-            alreadyInputString = "";
-        }
         ui->resultLineEdit->setText(alreadyInputString + "^");
     }
 }
 
 bool MainWindow::isOperatorCanOutPut(){
     alreadyInputString = ui->resultLineEdit->text();
+    if (alreadyInputString == "0") {
+        alreadyInputString = "";
+    }
     if (alreadyInputString.isEmpty()) {
         return false;
     }
@@ -268,14 +252,18 @@ void MainWindow::leftBraketButtonClicked() {
     if (alreadyInputString == "0") {
         alreadyInputString = "";
     }
+    leftBracketNum++;
     ui->resultLineEdit->setText(alreadyInputString+"(");
 }
 
 void MainWindow::rightBraketButtonClicked() {
+    if (leftBracketNum <= 0)
+        return;
     alreadyInputString = ui->resultLineEdit->text();
     if (alreadyInputString == "0") {
         alreadyInputString = "";
     }
+    leftBracketNum--;
     ui->resultLineEdit->setText(alreadyInputString+")");
 }
 

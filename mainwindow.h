@@ -20,6 +20,7 @@ public:
 private:
     Ui::MainWindow *ui;
     QString alreadyInputString;
+    int leftBracketNum;
     enum operand{plus, minus, by, divide};
     void setSLOT();
     bool isZoreCanOutput();
