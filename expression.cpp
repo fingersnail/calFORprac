@@ -5,125 +5,211 @@
 
 using namespace std;
 
-const QString expression::s_operator = "+-*/\^sincoslogtan. ()（）[]{}dot%";
-const QString expression::bySymbol = "×";
-const QString expression::divideSymbol = "÷";
+const QString expression::ALL_OPERATOR = "+-*/\^sincoslogtan. ()[]{}dot%";
+const QString expression::BINARY_OPERATOR = "+-*/\%^";
+const QString expression::UNARY_OPERATOR = "scltd"; //sin, cos, ln, tan, dot(cot)的第一个字母
+const QString expression::BRACKET = "()[]{}";
+const QString expression::MITIPLE_SIGN = "×";
+const QString expression::DIVISION_SIGN = "÷";
 
-bool expression::errorCheck(QString& s)
-{
-    int i = 0;
-    int bracketMatch = 0;
-    if (s[s.size() - 1] == '=')
-        s.remove(s.size() - 1, 1);         //因为习惯可能在表达式最后面家里个等号
-    for (i = 0; i < s.size(); i++)
-    {
-        s[i]=formatOperator(s[i]);
+expression::expression() {
+    rawExpression = "";
+    formatedExpression = "";
+    suffixExpression = "";
+}
 
-        if (s[i] == ' ')
-        {
-            s.remove(i, 1);
+expression::expression(QString rawExpression) {
+    this->rawExpression = rawExpression;
+    formatExpression();
+}
+
+void expression::formatExpression() {
+    formatedExpression = rawExpression;
+    formatOperator();
+    removeBlank();
+    removeEqualsSign();
+    //turnLnToLog();
+    //turncotToDot();
+    processSignedNumber();
+    insertMultipleSign();
+    qDebug() << "formatedExpression:" << formatedExpression;
+}
+
+void expression::formatOperator() {
+    for (int i = 0; i < formatedExpression.size(); i++) {
+        if (formatedExpression[i] == '\\' || formatedExpression[i] == '%' || formatedExpression[i] == DIVISION_SIGN[0])
+            //暂不支持取余操作，%算为除
+            formatedExpression[i] = '/';
+        if (formatedExpression[i] == MITIPLE_SIGN[0])
+            formatedExpression[i] = '*';
+        if (formatedExpression[i] == '[' || formatedExpression[i] == '[')
+            formatedExpression[i] = '(';
+        if (formatedExpression[i] == ']' || formatedExpression[i] == '}')
+            formatedExpression[i] = ')';
+    }
+}
+
+void expression::removeBlank() {
+    for (int i = 0; i < formatedExpression.size(); i++) {
+        if (formatedExpression[i].isSpace()) {
+            formatedExpression.remove(i, 1);
             i--;
-            continue;
-        }                           //去掉空格
-        if (s[i] == 'l'&&i<s.size() - 1 && s[i + 1] == 'n')
-        {
-            s.remove(i, 2);
-            s.insert(i, "log");
-        }                            //将ln换成log
-        if (s[i] == '-' || s[i] == '+')
-        {
-            if (i == 0 || i == s.size() - 1 || !(s[i - 1].isDigit()) && s[i - 1] != ')' && (s[i + 1].isDigit()))
-            {
-                s.insert(i, "(0");
-                int j = i + 3;
-                while (j<s.size() && (s[j].isDigit() || s[j] == '.'))
-                    j++;
-                s.insert(j, ")");
-            }
-        }                           //处理正负号的情况，如-8变为(0-8)，方便处理
-        if (s[i] == '.')
-        {
-            if (i == 0 || i == s.size() || !s[i - 1].isDigit() || !s[i + 1].isDigit())
-            {
+        }
+    }
+}
+
+void expression::removeEqualsSign() {
+    if (formatedExpression.isEmpty())
+        return;
+    if (formatedExpression[formatedExpression.size() - 1] == '=')
+        formatedExpression.remove(formatedExpression.size() - 1, 1);
+}
+
+//void expression::turnLnToLog(){
+//    if (s[i] == 'l'&&i<s.size() - 1 && s[i + 1] == 'n')
+//    {
+//        s.remove(i, 2);
+//        s.insert(i, "log");
+//    }
+//}
+//void expression::turnCotToDot(){
+//    if (s[i] == 'l'&&i<s.size() - 1 && s[i + 1] == 'n')
+//    {
+//        if (s[i] == 'c'&&s[i + 1] == 'o')
+//            s[i] = 'd';               //将cot变为dot方便处理
+//    }
+//}
+
+void expression::processSignedNumber() {
+    int j;
+    for (int i = 0; i < formatedExpression.size(); i++) {
+        if (isSignedNumber(formatedExpression, i)) {
+            formatedExpression.insert(i, "(0");
+            j = i + 3;
+            while (isPartOfANumber(formatedExpression, j))
+                j++;
+            formatedExpression.insert(j, ")");
+        }
+    }
+
+}
+
+bool expression::isSignedNumber(const QString& s, int i) const {
+    if ((s[i] == '-' || s[i] == '+') && i < s.size() - 1) {
+        return ((i == 0 || (i > 0) && (!s[i - 1].isDigit() || s[i - 1] == ')')) && (s[i + 1].isDigit() || isSubExpressionBeginPosition(s[i + 1])));
+    }
+        return false;
+}
+
+bool expression::isPartOfANumber(const QString& s, int i) const {
+    return (i < s.size() && i >= 0 && (s[i].isDigit() || s[i] == '.'));
+}
+
+void expression::insertMultipleSign() {
+    for (int i = 0; i < formatedExpression.size(); i++) {
+        if (isMultipleSignOmitedPosition(formatedExpression, i)) {
+                formatedExpression.insert(i, "*");
+        }
+    }
+}
+
+bool expression::isMultipleSignOmitedPosition(const QString& s, int i) const {
+    return (isSubExpressionBeginPosition(s[i]) && (i > 0 && (s[i - 1].isDigit() || s[i - 1] == ')')) ||
+            (i > 0 && s[i-1] == ')' && s[i].isDigit()));   //形如3sin2或(3+2)5
+}
+
+bool expression::isSubExpressionBeginPosition(const QChar c) const {
+    return (c == 's' || c == 'c' || c == 't' || c == 'd' || c == 'l' || c == '(');
+}
+
+bool expression::errorCheck() const{
+
+    return checkAllCharLegal() && checkDecimalPoint() && checkOperator() && checkBracketMatch() && checkExpresionEnding();
+}
+
+bool expression::checkAllCharLegal() const{
+    for (int i = 0; i < formatedExpression.size(); i++) {
+        if (ALL_OPERATOR.indexOf(formatedExpression[i]) == -1 && !formatedExpression[i].isDigit()) {
+            qDebug() << "2表达式中含有非法字符.";
+            return false;
+        }
+    }
+    return true;
+}
+
+bool expression::checkDecimalPoint() const{
+    for (int i = 0; i < formatedExpression.size(); i++) {
+        if (formatedExpression[i] == '.') {
+            if (i == 0 || i == formatedExpression.size() - 1 || !formatedExpression[i - 1].isDigit() || !formatedExpression[i + 1].isDigit()) {
                 qDebug() << "1小数点使用错误.";
                 return false;
             }
-        }                           //判断小数点
-        if (s_operator.indexOf(s[i]) >= s_operator.length() && !s[i].isDigit())
-        {
-            qDebug() << "2表达式中含有非法字符.";
-            return false;
-        }            //检验表达式中是否有非法字符
-        if (s_operator.indexOf(s[i]) == 22 || s_operator.indexOf(s[i]) == 24)
-        {
-            qDebug() << "3请不要输入中文括号.";
-            return false;
-        }                           //中文括号处理起来太麻烦了
-        if (s[i] == '+' || s[i] == '-' || s[i] == '*' || s[i] == '/' || s[i] == '^')
-        {
-            if (i == 0 || i == s.size()) {
-                qDebug() << "4运算符使用错误.";
+            i++;
+            while (i < formatedExpression.size() && formatedExpression[i].isDigit()) i++;
+            if (i < formatedExpression.size() && formatedExpression[i] == '.') {
+                qDebug() << "1小数点使用错误.";
                 return false;
             }
-            if (s[i + 1] != 's' && s[i + 1] != 'c' && s[i + 1] != 't' && s[i + 1] != 'l' && s[i + 1] != 'd' && s[i + 1] != '(')
-                if (!(s[i - 1].isDigit() || s[i - 1] == ')') || !(s[i + 1].isDigit() || s[i + 1] == '('))
-                {
-                    qDebug() << "4运算符使用错误.";
-                    return false;
-                }
-        }                           //双目运算两边必须为数字或左括号或其他函数
-        if (s[i] == 's' || s[i] == 'c' || s[i] == 't' || s[i] == 'd' || s[i] == 'l' || s[i] == '(')
-        {
-            if (i > 0 && (s[i - 1].isDigit() || s[i - 1] == ')'))
-                s.insert(i, "*");
-        }                          //将类似3sin5化成3*sin5的形式，方便处理
-        if (s[i] == ')'&&i<s.size() - 1 && (s[i + 1].isDigit()))
-        {
-            s.insert(i + 1, "*");
         }
-        if (s[i] == '(')
-            bracketMatch++;
-        if (s[i] == ')')
-            bracketMatch--;
-        if (bracketMatch<0)
-        {
+    }
+    return true;
+}
+
+bool expression::checkOperator() const{
+    for (int i = 0; i < formatedExpression.size(); i++) {
+        if (BINARY_OPERATOR.indexOf(formatedExpression[i]) != -1 && !isBinaryOperatorPositionRight(formatedExpression, i)) {
+            qDebug() << "4运算符使用错误.";
+            return false;
+        }
+        //检查单目运算符...
+    }
+    return true;
+}
+
+bool expression::isBinaryOperatorPositionRight(const QString& s, int i) const {
+    if (i == 0 || i == s.size() - 1) {
+        return false;
+    }
+    return (UNARY_OPERATOR.indexOf(s[i+1]) != -1 || s[i + 1] == '(' || s[i + 1].isDigit()) &&
+            (s[i - 1].isDigit() || s[i - 1] == ')');
+}            //双目运算右边必须为数字或左括号或其他函数，左边必须为数字或左括号
+
+bool expression::checkBracketMatch() const{
+    int leftBracketNum = 0;
+    for (int i = 0; i < formatedExpression.size(); i++) {
+        if (formatedExpression[i] == '(')
+            leftBracketNum++;
+        if (formatedExpression[i] == ')')
+            leftBracketNum--;
+        if (leftBracketNum < 0) {
             qDebug() << "5括号不匹配.";
             return false;
-        }                           //括号匹配
-        if (s[i] == 'c'&&s[i + 1] == 'o')
-            s[i] = 'd';               //将cot变为dot方便处理
+        }
     }
-    if (bracketMatch)
-    {
+    if (leftBracketNum != 0) {
         qDebug() << "6括号不匹配.";
         return false;
-    }                           //括号匹配
-    if (!s[s.size() - 1].isDigit() && (s[s.size() - 1]) != ')')
-    {
+    }
+    return true;
+}
+
+bool expression::checkExpresionEnding() const{
+    if (formatedExpression.isEmpty())
+        return true;
+    if (!formatedExpression[formatedExpression.size() - 1].isDigit() && (formatedExpression[formatedExpression.size() - 1]) != ')') {
         qDebug() << "7表达式尾部格式错误.";
         return false;
     }
     return true;
 }
 
-QChar expression::formatOperator(QChar c) {
-    if (c == '\\' || c == '%' || c == divideSymbol[0])    //暂不支持取余操作，%算为除
-        c = '/';
-    if (c == bySymbol[0])
-        c = '*';
-    if (c == '[' || c == '[')
-        c = '(';
-    if (c == ']' || c == '}')
-        c = ')';               //统一符号
-    return c;
-}
-
-QString expression::infixToSuffix(const QString &s) {
+QString expression::infixToSuffix() {
+    QString s = formatedExpression;
     stack<QChar> stackForOp;
     QString suf;            //存放后缀表达式
     QString one = "+-";
     QString two = "*/";
-    QString three = "sincostanlogdot";
+    QString three = "sincostanlndot";
     QString four = "^";          //四种运算优先级
 
     for (int i = 0; i < s.size(); i++)
@@ -184,6 +270,7 @@ QString expression::infixToSuffix(const QString &s) {
                 break;
             case 'l':
                 stackForOp.push('l');
+                i--;
                 break;
             default:
                 //cout << "表达式有误.\n";
@@ -232,6 +319,7 @@ double expression::calSuffix(const QString &s)
     QString num = "";
     int i = 0;
     double a1, a2;
+
     for (i = 0; i<s.size(); i++)
     {
         if (s[i].isDigit() || s[i] == '.')
@@ -246,6 +334,7 @@ double expression::calSuffix(const QString &s)
             num = "";
             continue;
         }
+
         switch (s[i].unicode())
         {
         case '+':
@@ -394,23 +483,12 @@ double expression::calSuffix(const QString &s)
     return result.top();
 }
 
-double expression::cal_E(QString s)
+double expression::calExpression()
 {
-    if (!errorCheck(s))
+    if (!errorCheck())
         return NAN;
-    qDebug() << "format: " << s;
-    s = infixToSuffix(s);
-    qDebug() << "suffix: " << s;
-    return calSuffix(s);
+    qDebug() << "No error";
+    suffixExpression = infixToSuffix();
+    return calSuffix(suffixExpression);
 }
 
-double expression::cal_E(char* c)
-{
-    QString s = c;
-    return cal_E(s);
-}
-
-double expression::cal_E_Formal(const QString &s)
-{
-    return calSuffix(infixToSuffix(s));
-}

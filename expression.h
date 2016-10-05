@@ -9,35 +9,52 @@ using namespace std;
 
 class expression {
 public:
-    static bool errorCheck(QString&);
-    //输入为以字符串表示的某个表达式
-    //该函数会判断表达式是否合法，给出不合法类型
-    //该函数会修改原字符串，使其更规范
-    //如表达式合法返回true，不合法返回false
+    expression();
+    expression(QString);
 
-    static QString infixToSuffix(const QString &);
-    //前条件：输入为正确的中缀表达式
-    //返回后缀表达式
+    //检查表达式中的错误
+    bool errorCheck() const;
 
-    static double calSuffix(const QString &);
-    //前条件：输入为正确的后缀表达式
-    //返回表达式的值
+    //将中缀表达式变换为后缀表达式
+    QString infixToSuffix();
 
-    static double cal_E(QString);
-    //string为一般（中缀）表达式
-    //该函数会调用errorCheck，infixToSuffix，calSuffix函数
-    //返回表达式的值
+    //计算一般（中缀）表达式的值
+    double calExpression();
 
-    static double cal_E(char* );
-    //该函数为cal_E的重载函数
-
-    static double cal_E_Formal(const QString &);
-    //输入规范的中缀表达式，计算值
-    //与cal_E函数相比省去了检错与规范化的步骤
 private:
-    static QChar formatOperator(QChar);
-    const static QString s_operator;
-    const static QString bySymbol;
-    const static QString divideSymbol;
+    QString rawExpression;
+    QString formatedExpression;
+    QString suffixExpression;
+
+    const static QString ALL_OPERATOR;
+    const static QString BINARY_OPERATOR;
+    const static QString UNARY_OPERATOR;
+    const static QString BRACKET;
+    const static QString MITIPLE_SIGN;
+    const static QString DIVISION_SIGN;
+
+
+    //将表达式规范化
+    void formatExpression();
+
+    void formatOperator();    //统一符号格式
+    void removeBlank();       //去除空白字符
+    void removeEqualsSign();  //去除尾部可能出现的等号
+    //void turnLnToLog();
+    void processSignedNumber();   //将带符号数处理成0减或加正数的形式
+    bool isSignedNumber(const QString &, int) const; //判断字符串的第相应位位是不是带符号数的正负号
+    bool isPartOfANumber(const QString &, int) const; //判断字符串的第相应位位是不是一个数字的一部分
+    void insertMultipleSign();      //在必要位置插入乘号，比如3sin2变为3*sin2
+    bool isMultipleSignOmitedPosition(const QString &, int) const;  //判断该处是不是省略了乘号
+    bool isSubExpressionBeginPosition(const QChar) const;   //判断字符是不是子表达式开始的地方
+
+    bool checkAllCharLegal() const;      //检查是否所有字符都合法
+    bool checkDecimalPoint() const;      //检查小数点使用是否合法
+    bool checkOperator() const;          //检查操作符使用是否合法
+    bool isBinaryOperatorPositionRight(const QString &, int) const; //判断该处的双目运算符是否处在正确位置今年
+    bool checkBracketMatch() const;      //检查括号是否匹配
+    bool checkExpresionEnding() const;   //检查表达式结尾是否合法
+
+    double calSuffix(const QString &);       //计算后缀表达式的值
 };
 #endif // EXPRESSION_H

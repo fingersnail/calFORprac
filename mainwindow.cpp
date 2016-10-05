@@ -249,6 +249,8 @@ void MainWindow::rightBraketButtonClicked() {
 
 void MainWindow::equalsButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
-    double result = expression::cal_E(alreadyInputString);
+    expression inputExpression(alreadyInputString);
+
+    double result = inputExpression.calExpression();
     ui->resultLineEdit->setText(QString::number(result));
 }
