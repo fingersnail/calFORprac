@@ -1,4 +1,5 @@
 #include "expression.h"
+#include "calexception.h"
 #include <stack>
 #include <cstdlib>
 #include <cmath>
@@ -24,8 +25,8 @@ expression::expression(QString rawExpression) {
 }
 
 double expression::calExpression() {
-    if (!errorCheck())
-        return NAN;
+    errorCheck();
+
     qDebug() << "No error";
     suffixExpression = infixToSuffix();
     return calSuffix(suffixExpression);
@@ -152,7 +153,7 @@ bool expression::errorCheck() const{
 bool expression::checkAllCharLegal() const{
     for (int i = 0; i < formatedExpression.size(); i++) {
         if (ALL_OPERATOR.indexOf(formatedExpression[i]) == -1 && !formatedExpression[i].isDigit()) {
-            qDebug() << "2表达式中含有非法字符.";
+            throw IllegalCharactorException();
             return false;
         }
     }
@@ -163,13 +164,13 @@ bool expression::checkDecimalPoint() const{
     for (int i = 0; i < formatedExpression.size(); i++) {
         if (formatedExpression[i] == '.') {
             if (i == 0 || i == formatedExpression.size() - 1 || !formatedExpression[i - 1].isDigit() || !formatedExpression[i + 1].isDigit()) {
-                qDebug() << "1小数点使用错误.";
+                throw DecimalPointException();
                 return false;
             }
             i++;
             while (i < formatedExpression.size() && formatedExpression[i].isDigit()) i++;
             if (i < formatedExpression.size() && formatedExpression[i] == '.') {
-                qDebug() << "1小数点使用错误.";
+                throw DecimalPointException();
                 return false;
             }
         }
@@ -180,7 +181,7 @@ bool expression::checkDecimalPoint() const{
 bool expression::checkOperator() const {
     for (int i = 0; i < formatedExpression.size(); i++) {
         if (BINARY_OPERATOR.indexOf(formatedExpression[i]) != -1 && !isBinaryOperatorPositionRight(formatedExpression, i)) {
-            qDebug() << "4运算符使用错误.";
+            throw OperatorException();
             return false;
         }
         //检查单目运算符...
@@ -204,12 +205,12 @@ bool expression::checkBracketMatch() const{
         if (formatedExpression[i] == ')')
             leftBracketNum--;
         if (leftBracketNum < 0) {
-            qDebug() << "5括号不匹配.";
+            throw BracketNotMatchException();
             return false;
         }
     }
     if (leftBracketNum != 0) {
-        qDebug() << "6括号不匹配.";
+        throw BracketNotMatchException();
         return false;
     }
     return true;
@@ -219,7 +220,7 @@ bool expression::checkExpresionEnding() const{
     if (formatedExpression.isEmpty())
         return true;
     if (!formatedExpression[formatedExpression.size() - 1].isDigit() && (formatedExpression[formatedExpression.size() - 1]) != ')') {
-        qDebug() << "7表达式尾部格式错误.";
+        throw ExpressionEndingException();
         return false;
     }
     return true;
@@ -342,8 +343,7 @@ double expression::calSuffix(const QString &s) {
         switch (s[i].unicode()) {
         case '+':
             if (resultStack.size()<2) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
@@ -354,8 +354,7 @@ double expression::calSuffix(const QString &s) {
             break;
         case '-':
             if (resultStack.size() < 2) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
@@ -366,8 +365,7 @@ double expression::calSuffix(const QString &s) {
             break;
         case '*':
             if (resultStack.size() < 2) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
@@ -378,15 +376,14 @@ double expression::calSuffix(const QString &s) {
             break;
         case '/':
             if (resultStack.size() < 2) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
             operandRight = resultStack.top();
             resultStack.pop();
             if (operandLeft == 0) {
-                return INFINITY;
+                throw DividedByZeroException();
             }
             else {
                 temp = operandRight / operandLeft;
@@ -395,8 +392,7 @@ double expression::calSuffix(const QString &s) {
             break;
         case '^':
             if (resultStack.size() < 2) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
@@ -404,15 +400,13 @@ double expression::calSuffix(const QString &s) {
             resultStack.pop();
             temp = pow(operandRight, operandLeft);
             if (isnan(temp)) {
-                //cout << "表达式无意义.\n";        可以选择显示提示，但可能对解方程程序有影响
-                return NAN;
+                throw PowerException();
             }
             resultStack.push(temp);
             break;
         case 's':
             if (resultStack.size() < 1) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
@@ -421,8 +415,7 @@ double expression::calSuffix(const QString &s) {
             break;
         case 'c':
             if (resultStack.size() < 1) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
@@ -431,8 +424,7 @@ double expression::calSuffix(const QString &s) {
             break;
         case 't':
             if (resultStack.size() < 1) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
@@ -441,8 +433,7 @@ double expression::calSuffix(const QString &s) {
             break;
         case 'd':
             if (resultStack.size() < 1) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
@@ -451,23 +442,23 @@ double expression::calSuffix(const QString &s) {
             break;
         case 'l':
             if (resultStack.size() < 1) {
-                //cout << "表达式有误.\n";
-                return NAN;
+                throw ExpressionErrorException();
             }
             operandLeft = resultStack.top();
             resultStack.pop();
+            if (operandLeft <= 0) {
+                throw LogException();
+            }
             temp = log(operandLeft);
             resultStack.push(temp);
             break;
         default:
-            //cout << "表达式有误.\n";
-            return NAN;
+            throw ExpressionErrorException();
             break;
         }
     }
     if (resultStack.size() != 1) {
-        //cout << "表达式有误.\n";
-        return NAN;
+        throw ExpressionErrorException();
     }
     return resultStack.top();
 }

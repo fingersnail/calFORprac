@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "calexception.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -271,6 +272,13 @@ void MainWindow::equalsButtonClicked() {
     alreadyInputString = ui->resultLineEdit->text();
     expression inputExpression(alreadyInputString);
 
-    double result = inputExpression.calExpression();
+    double result;
+    try {
+        result = inputExpression.calExpression();
+    } catch (CalException& e) {
+        ui->resultLineEdit->setText(e.what());
+        return;
+    }
+
     ui->resultLineEdit->setText(QString::number(result));
 }

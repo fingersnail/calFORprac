@@ -18,6 +18,7 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     ../../CodeBlocks/ÀúÊ·/math kit/include/Expression.h \
-    expression.h
+    expression.h \
+    calexception.h
 
 FORMS    += mainwindow.ui
