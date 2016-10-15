@@ -67,10 +67,10 @@ bool MainWindow::isZoreCanOutput() {
     QChar lastCharOfResult = alreadyInputString[alreadyInputString.size() - 1];
     if(alreadyInputString.size() == 1) {
         return lastCharOfResult != '0';
+    } else {
+        QChar secondLastCharOfResult = alreadyInputString[alreadyInputString.size() - 2];
+        return secondLastCharOfResult.isDigit() || lastCharOfResult != '0';
     }
-
-    QChar secondLastCharOfResult = alreadyInputString[alreadyInputString.size() - 2];
-    return secondLastCharOfResult.isDigit();
 }
 
 void MainWindow::button1Clicked() {
